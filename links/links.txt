@@ -1,1 +1,2 @@
-- http://javatheprogram.blogspot.it/2013/05/merge-audio-and-video.html
+- Merge audio and video: http://javatheprogram.blogspot.it/2013/05/merge-audio-and-video.html
+- Swing Worker: http://www.javacreed.com/swing-worker-example/
