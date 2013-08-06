@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import jraidownloader.logging.JRaiLogger;
+import jraidownloader.properties.PropertiesManager;
+import jraidownloader.utils.FileUtils;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -32,9 +34,11 @@ public class JRaiDownloader {
 	public static void main(String[] args) throws ClientProtocolException, IOException {
 		JRaiLogger.getLogger().setLevel(Level.INFO);
 		
+		//Setta i valori di default delle proprietà
+		PropertiesManager.setDefaultValues();
+		
 		JRaiFrame jRaiFrame = new JRaiFrame("JRaiDownloader " + VERSION);
 		jRaiFrame.setVisible(true);
-		
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
+ * Il gestore del logging.
  * @author <a reef="https://github.com/DavidePastore">DavidePastore</a>
  *
  */

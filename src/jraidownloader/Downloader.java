@@ -15,7 +15,9 @@ import javax.swing.JProgressBar;
 
 import jraidownloader.httpclient.JRDHttpClient;
 import jraidownloader.logging.JRaiLogger;
+import jraidownloader.properties.PropertiesManager;
 import jraidownloader.utils.ByteUtils;
+import jraidownloader.utils.FileUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,8 +31,6 @@ import org.apache.http.client.methods.HttpGet;
  *
  */
 public class Downloader {
-	
-	private String basicPath = "C:\\Documents and Settings\\giuseppe\\Desktop\\Davide\\";
 
 	/**
 	 * Scarica un file.
@@ -53,7 +53,19 @@ public class Downloader {
 			float percentuale = 0;
 			InputStream instream = entity.getContent();
 			BufferedInputStream bis = new BufferedInputStream(instream);
-			String filePath = basicPath + fileName;
+			
+			//Setting the file path
+			String filePath;
+			filePath = PropertiesManager.getProperty(PropertiesManager.SAVE_PATH_KEY);
+			
+			
+			if(!FileUtils.fileExists(filePath)){
+				FileUtils.createDirectory(filePath);
+			}
+			
+			filePath += File.separator + fileName;
+			JRaiLogger.getLogger().log(Level.INFO, "filepath: " + filePath);
+
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
 			int inByte;
 	        while ((inByte = bis.read()) != -1 ) {

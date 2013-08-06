@@ -23,6 +23,9 @@ import jraidownloader.logging.JRaiLogger;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 /**
  * Finestra principale per l'applicazione.
@@ -30,12 +33,34 @@ import org.json.JSONException;
  *
  */
 public class JRaiFrame extends JFrame {
+	
+	/**
+	 * L'URL viene analizzato.
+	 */
+	public static final String ANALIZZA_URL = "Analizza URL";
+	
+	/**
+	 * Il download è in corso.
+	 */
+	public static final String DOWNLOAD_IN_CORSO = "Download in corso";
+	
+	/**
+	 * Il download è stato completato.
+	 */
+	public static final String DOWNLOAD_COMPLETATO = "<html><font color='green'>Download effettuato con successo</font></html>";
+	
+	/**
+	 * Il download ha provocato un errore.
+	 */
+	public static final String DOWNLOAD_ERRATO = "<html><font color='red'>Download errato</font></html>";
 
 	private JPanel contentPane;
 	private JTextField textFieldUrl;
 	private JProgressBar progressBar;
-	private JLabel labelRisultato;
+	private JLabel labelStato;
 	private JButton submitButton;
+	private JMenu settingsMenu;
+	private JMenuItem menuItemCustomize;
 
 	/**
 	 * Create the frame.
@@ -43,7 +68,7 @@ public class JRaiFrame extends JFrame {
 	public JRaiFrame() {
 		setTitle("JRaiDownloader");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 407, 144);
+		setBounds(100, 100, 490, 205);
 		contentPane = new JPanel();
 		contentPane.setToolTipText("");
 		contentPane.setBorder(new TitledBorder(null, "Form", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -51,17 +76,7 @@ public class JRaiFrame extends JFrame {
 		SpringLayout sl_contentPane = new SpringLayout();
 		contentPane.setLayout(sl_contentPane);
 		
-		JLabel labelUrl = new JLabel("URL");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, labelUrl, 3, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, labelUrl, 26, SpringLayout.WEST, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.EAST, labelUrl, 52, SpringLayout.WEST, contentPane);
-		contentPane.add(labelUrl);
-		labelUrl.setHorizontalAlignment(SwingConstants.RIGHT);
-		labelUrl.setLabelFor(textFieldUrl);
-		
 		textFieldUrl = new JTextField();
-		sl_contentPane.putConstraint(SpringLayout.NORTH, textFieldUrl, -3, SpringLayout.NORTH, labelUrl);
-		sl_contentPane.putConstraint(SpringLayout.WEST, textFieldUrl, 34, SpringLayout.EAST, labelUrl);
 		sl_contentPane.putConstraint(SpringLayout.EAST, textFieldUrl, -10, SpringLayout.EAST, contentPane);
 		contentPane.add(textFieldUrl);
 		textFieldUrl.setColumns(2);
@@ -79,8 +94,11 @@ public class JRaiFrame extends JFrame {
 						progressBar.setEnabled(true);
 						Video video;
 						try {
+							labelStato.setText(JRaiFrame.ANALIZZA_URL);
 							video = new Video(textFieldUrl.getText());
 							String url = video.findBestQualityUrl();
+							
+							labelStato.setText(JRaiFrame.DOWNLOAD_IN_CORSO);
 							Downloader downloader = new Downloader();
 							downloader.downloadFile(url, video.getNomeProgramma() + ".mp4", progressBar);
 						} catch (ClientProtocolException e) {
@@ -107,11 +125,11 @@ public class JRaiFrame extends JFrame {
 						//super.done();
 						if(error){
 							submitButton.setEnabled(true);
-							labelRisultato.setText("<html><font color='red'>Download errato</font></html>");
+							labelStato.setText(JRaiFrame.DOWNLOAD_ERRATO);
 						}
 						else{
 							submitButton.setEnabled(true);
-							labelRisultato.setText("<html><font color='green'>Download effettuato con successo</font></html>");
+							labelStato.setText(JRaiFrame.DOWNLOAD_COMPLETATO);
 						}
 					}
 					
@@ -125,16 +143,42 @@ public class JRaiFrame extends JFrame {
 		
 		progressBar = new JProgressBar();
 		sl_contentPane.putConstraint(SpringLayout.NORTH, progressBar, 14, SpringLayout.SOUTH, submitButton);
-		sl_contentPane.putConstraint(SpringLayout.WEST, progressBar, 0, SpringLayout.WEST, labelUrl);
 		sl_contentPane.putConstraint(SpringLayout.SOUTH, progressBar, 33, SpringLayout.SOUTH, submitButton);
 		sl_contentPane.putConstraint(SpringLayout.EAST, progressBar, 0, SpringLayout.EAST, textFieldUrl);
 		contentPane.add(progressBar);
 		
-		labelRisultato = new JLabel("");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, labelRisultato, 4, SpringLayout.NORTH, submitButton);
-		sl_contentPane.putConstraint(SpringLayout.WEST, labelRisultato, 0, SpringLayout.WEST, labelUrl);
-		sl_contentPane.putConstraint(SpringLayout.EAST, labelRisultato, -155, SpringLayout.WEST, submitButton);
-		contentPane.add(labelRisultato);
+		labelStato = new JLabel("");
+		sl_contentPane.putConstraint(SpringLayout.NORTH, labelStato, 4, SpringLayout.NORTH, submitButton);
+		sl_contentPane.putConstraint(SpringLayout.EAST, labelStato, -155, SpringLayout.WEST, submitButton);
+		contentPane.add(labelStato);
+		
+		JLabel labelUrl = new JLabel("URL");
+		sl_contentPane.putConstraint(SpringLayout.WEST, labelStato, 0, SpringLayout.WEST, labelUrl);
+		sl_contentPane.putConstraint(SpringLayout.WEST, progressBar, 0, SpringLayout.WEST, labelUrl);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, textFieldUrl, -3, SpringLayout.NORTH, labelUrl);
+		sl_contentPane.putConstraint(SpringLayout.WEST, textFieldUrl, 34, SpringLayout.EAST, labelUrl);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, labelUrl, 3, SpringLayout.NORTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.WEST, labelUrl, 26, SpringLayout.WEST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, labelUrl, 52, SpringLayout.WEST, contentPane);
+		contentPane.add(labelUrl);
+		labelUrl.setHorizontalAlignment(SwingConstants.RIGHT);
+		labelUrl.setLabelFor(textFieldUrl);
+		
+		JMenuBar menuBar = new JMenuBar();
+		this.setJMenuBar(menuBar);
+		
+		settingsMenu = new JMenu("Impostazioni");
+		menuBar.add(settingsMenu);
+		
+		menuItemCustomize = new JMenuItem("Personalizza");
+		menuItemCustomize.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SettingsDialog settingsDialog = new SettingsDialog(JRaiFrame.this, true);
+				settingsDialog.setAlwaysOnTop(true);
+				settingsDialog.setVisible(true);
+			}
+		});
+		settingsMenu.add(menuItemCustomize);
 	}
 	
 	/**
