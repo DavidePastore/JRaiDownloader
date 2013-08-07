@@ -19,6 +19,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
+import jraidownloader.dialog.SceltaQualita;
+import jraidownloader.dialog.SettingsDialog;
 import jraidownloader.logging.JRaiLogger;
 
 import org.apache.http.client.ClientProtocolException;
@@ -38,6 +40,11 @@ public class JRaiFrame extends JFrame {
 	 * L'URL viene analizzato.
 	 */
 	public static final String ANALIZZA_URL = "Analizza URL";
+	
+	/**
+	 * La qualità non viene scelta.
+	 */
+	public static final String QUALITA_NON_SCELTA = "<html><font color='red'>Qualità non scelta</font></html>";
 	
 	/**
 	 * Il download è in corso.
@@ -61,6 +68,8 @@ public class JRaiFrame extends JFrame {
 	private JButton submitButton;
 	private JMenu settingsMenu;
 	private JMenuItem menuItemCustomize;
+	
+	private Video video;
 
 	/**
 	 * Create the frame.
@@ -92,11 +101,19 @@ public class JRaiFrame extends JFrame {
 					protected Void doInBackground() {
 						submitButton.setEnabled(false);
 						progressBar.setEnabled(true);
-						Video video;
 						try {
 							labelStato.setText(JRaiFrame.ANALIZZA_URL);
 							video = new Video(textFieldUrl.getText());
-							String url = video.findBestQualityUrl();
+							SceltaQualita sceltaQualita = new SceltaQualita(JRaiFrame.this, true, video);
+							sceltaQualita.setAlwaysOnTop(true);
+							sceltaQualita.setVisible(true);
+							
+							if(video.getQualitaVideo() == null){
+								throw new Exception("Qualità del video non scelta");
+							}
+							
+							//String url = video.findBestQualityUrl();
+							String url = video.getUrls().get(video.getQualitaVideo());
 							
 							labelStato.setText(JRaiFrame.DOWNLOAD_IN_CORSO);
 							Downloader downloader = new Downloader();
@@ -189,4 +206,27 @@ public class JRaiFrame extends JFrame {
 		this();
 		setTitle(title);
 	}
+	
+	/**
+	 * @return the video
+	 */
+	public Video getVideo() {
+		return video;
+	}
+
+	/**
+	 * @param video the video to set
+	 */
+	public void setVideo(Video video) {
+		this.video = video;
+	}
+
+	/**
+	 * Setta il testo della label stato.
+	 * @param string il nuovo testo da settare.
+	 */
+	public void setStateLabel(String stato) {
+		this.labelStato.setText(stato);
+	}
+
 }

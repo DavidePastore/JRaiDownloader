@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jraidownloader;
+package jraidownloader.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

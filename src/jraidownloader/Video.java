@@ -74,6 +74,12 @@ public class Video {
 	
 	
 	/**
+	 * La qualità del video scelta.
+	 */
+	private String qualitaVideo;
+
+
+	/**
 	 * Costruttore per il video.
 	 * @param url l'url in cui è presente il video.
 	 * @throws Exception 
@@ -211,13 +217,6 @@ public class Video {
 				}
 			}
 		}
-		/* catch (ClientProtocolException e) {
-			JRaiLogger.getLogger().log(Level.SEVERE, "ClientProtocolException: " + e);
-		} catch (IOException e) {
-			JRaiLogger.getLogger().log(Level.SEVERE, "IOException: " + e);
-		} catch (JSONException e) {
-			JRaiLogger.getLogger().log(Level.SEVERE, "JSONException: " + e);
-		}*/
 	}
 	
 	/**
@@ -230,7 +229,6 @@ public class Video {
 		String url = "";
 		String location = "";
 		Set<String> keys = urls.keySet();
-		Collection collection = urls.values();
 		Iterator iterator = keys.iterator();
 		
 		//Prende l'ultimo url inserito nella lista
@@ -300,6 +298,21 @@ public class Video {
 	 */
 	public Map<String, String> getUrls() {
 		return urls;
+	}
+	
+	/**
+	 * @return the qualitaVideo
+	 */
+	public String getQualitaVideo() {
+		return qualitaVideo;
+	}
+
+
+	/**
+	 * @param qualitaVideo the qualitaVideo to set
+	 */
+	public void setQualitaVideo(String qualitaVideo) {
+		this.qualitaVideo = qualitaVideo;
 	}
 
 }

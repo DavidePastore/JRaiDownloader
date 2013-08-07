@@ -1,4 +1,5 @@
 JRaiDownloader v0.1.0
 - funzionalità base per il download di video della sezione Rai Replay;
 - cartella di destinazione del file scaricato personalizzabile;
-- impostazioni salvate all'interno di un file di configurazione.
+- il path in cui salvare i video è salvato all'interno di un file di configurazione;
+- possibilità di scegliere la qualità del video da scaricare;
