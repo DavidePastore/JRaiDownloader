@@ -48,7 +48,7 @@ public class Downloader {
 		HttpEntity entity = httpResponse.getEntity();
 		if (entity != null) {
 			long length = entity.getContentLength();
-			progressBar.setMaximum((int) (ByteUtils.fromBytesToMegaBytes(entity.getContentLength())));
+			progressBar.setMaximum((int) (ByteUtils.fromBytesToMegaBytes(length)));
 			long currentByte = 0;
 			float percentuale = 0;
 			InputStream instream = entity.getContent();
@@ -72,7 +72,7 @@ public class Downloader {
 	        	currentByte++;
 	        	progressBar.setValue((int) ((ByteUtils.fromBytesToMegaBytes(currentByte))));
 	        	progressBar.setStringPainted(true);
-	        	progressBar.setString((int) (currentByte/1024/1024) + " MB/" + (int) (entity.getContentLength()/1024/1024) + " MB");
+	        	progressBar.setString((int) (ByteUtils.fromBytesToMegaBytes(currentByte)) + " MB/" + (int) (ByteUtils.fromBytesToMegaBytes(length)) + " MB");
 	        	if(percentuale != 100 * currentByte / length){
 	        		percentuale = 100 * currentByte / length;
 	        		JRaiLogger.getLogger().log(Level.FINE, percentuale + "% -> " + currentByte + "/" + length);

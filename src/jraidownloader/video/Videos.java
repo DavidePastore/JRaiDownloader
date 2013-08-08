@@ -1,37 +1,36 @@
 /**
  * 
  */
-package jraidownloader;
+package jraidownloader.video;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import jraidownloader.Canale;
 import jraidownloader.httpclient.JRDHttpClient;
+import jraidownloader.httpclient.JRDHttpClientUtils;
 import jraidownloader.logging.JRaiLogger;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Classe rappresentante il video.
+ * Classe rappresentante la lista dei video con le differenti qualità, dimensioni e url.
  * @author <a reef="https://github.com/DavidePastore">DavidePastore</a>
  *
  */
-public class Video {
+public class Videos {
 	
 	
 	/**
@@ -66,17 +65,15 @@ public class Video {
 	 */
 	private String jSonUrl;
 	
-	
 	/**
 	 * Tutti i video disponibili in base alle qualità.
 	 */
-	private Map<String, String> urls = new HashMap<String, String>();
-	
+	private ArrayList<Video> listaVideo = new ArrayList<Video>();
 	
 	/**
-	 * La qualità del video scelta.
+	 * Il video scelto.
 	 */
-	private String qualitaVideo;
+	private Video videoScelto;
 
 
 	/**
@@ -84,7 +81,7 @@ public class Video {
 	 * @param url l'url in cui è presente il video.
 	 * @throws Exception 
 	 */
-	public Video(String url) throws Exception{
+	public Videos(String url) throws Exception{
 		this.checkUrl(url);
 		this.parseUrl(url);
 		this.cercaJsonUrl();
@@ -179,31 +176,45 @@ public class Video {
 				
 				//Popolo con tutti gli url
 				if(!jSonObjectProgramma.getString("h264").equals("")){
-					urls.put("h264", jSonObjectProgramma.getString("h264"));
+					String url = jSonObjectProgramma.getString("h264");
+					Video video = new Video(url, "h264", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				if(!jSonObjectProgramma.getString("h264_400").equals("")){
-					urls.put("h264_400", jSonObjectProgramma.getString("h264_400"));
+					String url = jSonObjectProgramma.getString("h264_400");
+					Video video = new Video(url, "h264_400", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				if(!jSonObjectProgramma.getString("h264_600").equals("")){
-					urls.put("h264_600", jSonObjectProgramma.getString("h264_600"));
+					String url = jSonObjectProgramma.getString("h264_600");
+					Video video = new Video(url, "h264_600", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				if(!jSonObjectProgramma.getString("h264_800").equals("")){
-					urls.put("h264_800", jSonObjectProgramma.getString("h264_800"));
+					String url = jSonObjectProgramma.getString("h264_800");
+					Video video = new Video(url, "h264_800", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				if(!jSonObjectProgramma.getString("h264_1200").equals("")){
-					urls.put("h264_1200", jSonObjectProgramma.getString("h264_1200"));
+					String url = jSonObjectProgramma.getString("h264_1200");
+					Video video = new Video(url, "h264_1200", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				if(!jSonObjectProgramma.getString("h264_1500").equals("")){
-					urls.put("h264_1500", jSonObjectProgramma.getString("h264_1500"));
+					String url = jSonObjectProgramma.getString("h264_1500");
+					Video video = new Video(url, "h264_1500", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				if(!jSonObjectProgramma.getString("h264_1800").equals("")){
-					urls.put("h264_1800", jSonObjectProgramma.getString("h264_1800"));
+					String url = jSonObjectProgramma.getString("h264_1800");
+					Video video = new Video(url, "h264_1800", JRDHttpClientUtils.getContentLength(url));
+					listaVideo.add(video);
 				}
 				
 				
@@ -221,41 +232,40 @@ public class Video {
 	
 	/**
 	 * Trova l'url del video con la miglior qualità.
+	 * TODO testare che funzioni come aspettato.
 	 * @return Ritorna l'url del video con la miglior qualità.
 	 * @throws IOException 
-	 * @throws ClientProtocolException 
+	 * @throws ClientProtocolException
 	 */
 	public String findBestQualityUrl() throws ClientProtocolException, IOException{
 		String url = "";
-		String location = "";
-		Set<String> keys = urls.keySet();
-		Iterator iterator = keys.iterator();
+		Iterator<Video> iterator = listaVideo.iterator();
 		
-		//Prende l'ultimo url inserito nella lista
+		//Prende l'ultimo url inserito nella lista dei video
 		while(iterator.hasNext()){
-			String key = (String) iterator.next();
-			JRaiLogger.getLogger().log(Level.FINE, key + ": " + urls.get(key));
-			url = urls.get(key);
+			Video video = iterator.next();
+			JRaiLogger.getLogger().log(Level.FINE, video.toString());
+			url = video.getUrl();
 		}
-		
-		HttpClient httpClient = JRDHttpClient.get();
-		HttpGet httpGet = new HttpGet(url);
-		HttpParams params = httpGet.getParams();
-		params.setParameter(ClientPNames.HANDLE_REDIRECTS, Boolean.FALSE);
-		httpGet.setParams(params);
-		
-		HttpResponse httpResponse;
-		HttpEntity httpEntity = null;
-		httpResponse = httpClient.execute(httpGet);
-		httpEntity = httpResponse.getEntity();
-		
-		location = httpResponse.getFirstHeader("Location").getValue();
-		try {
-			EntityUtils.consume(httpEntity);
-		} catch (IOException e) {
-			JRaiLogger.getLogger().log(Level.SEVERE, "IOException: " + e);
+		return JRDHttpClientUtils.getLocation(url);
+	}
+	
+	
+	/**
+	 * Trova il video data la sua qualità.
+	 * @param qualita la qualità del video.
+	 * @return Il video con la qualità scelta.
+	 */
+	public Video getVideoByQuality(String qualita){
+		Video video;
+		Iterator<Video> iterator = listaVideo.iterator();
+		while(iterator.hasNext()){
+			video = iterator.next();
+			if(video.getQualita().equals(qualita)){
+				return video;
+			}
 		}
-		return location;
+		return null;
 	}
 
 	/**
@@ -287,32 +297,35 @@ public class Video {
 	}
 
 	/**
+	 * @return the listaVideo
+	 */
+	public ArrayList<Video> getListaVideo() {
+		return listaVideo;
+	}
+
+
+	/**
 	 * @return the nomeProgramma
 	 */
 	public String getNomeProgramma() {
 		return nomeProgramma;
 	}
 
+
 	/**
-	 * @return the urls
+	 * @return the videoScelto
 	 */
-	public Map<String, String> getUrls() {
-		return urls;
-	}
-	
-	/**
-	 * @return the qualitaVideo
-	 */
-	public String getQualitaVideo() {
-		return qualitaVideo;
+	public Video getVideoScelto() {
+		return videoScelto;
 	}
 
 
 	/**
-	 * @param qualitaVideo the qualitaVideo to set
+	 * @param videoScelto the videoScelto to set
 	 */
-	public void setQualitaVideo(String qualitaVideo) {
-		this.qualitaVideo = qualitaVideo;
+	public void setVideoScelto(Video videoScelto) {
+		this.videoScelto = videoScelto;
 	}
+
 
 }

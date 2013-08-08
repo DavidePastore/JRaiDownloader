@@ -3,3 +3,4 @@ JRaiDownloader v0.1.0
 - cartella di destinazione del file scaricato personalizzabile;
 - il path in cui salvare i video è salvato all'interno di un file di configurazione;
 - possibilità di scegliere la qualità del video da scaricare;
+- ogni qualità video ha il suo oggetto separato;

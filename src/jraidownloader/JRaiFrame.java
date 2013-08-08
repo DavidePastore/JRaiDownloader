@@ -6,6 +6,7 @@ package jraidownloader;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
@@ -22,6 +23,8 @@ import javax.swing.border.TitledBorder;
 import jraidownloader.dialog.SceltaQualita;
 import jraidownloader.dialog.SettingsDialog;
 import jraidownloader.logging.JRaiLogger;
+import jraidownloader.video.Video;
+import jraidownloader.video.Videos;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
@@ -39,7 +42,7 @@ public class JRaiFrame extends JFrame {
 	/**
 	 * L'URL viene analizzato.
 	 */
-	public static final String ANALIZZA_URL = "Analizza URL";
+	public static final String ANALISI_URL = "Analisi URL";
 	
 	/**
 	 * La qualità non viene scelta.
@@ -69,7 +72,7 @@ public class JRaiFrame extends JFrame {
 	private JMenu settingsMenu;
 	private JMenuItem menuItemCustomize;
 	
-	private Video video;
+	private Videos videos;
 
 	/**
 	 * Create the frame.
@@ -102,22 +105,23 @@ public class JRaiFrame extends JFrame {
 						submitButton.setEnabled(false);
 						progressBar.setEnabled(true);
 						try {
-							labelStato.setText(JRaiFrame.ANALIZZA_URL);
-							video = new Video(textFieldUrl.getText());
-							SceltaQualita sceltaQualita = new SceltaQualita(JRaiFrame.this, true, video);
+							labelStato.setText(JRaiFrame.ANALISI_URL);
+							videos = new Videos(textFieldUrl.getText());
+							SceltaQualita sceltaQualita = new SceltaQualita(JRaiFrame.this, true, videos);
 							sceltaQualita.setAlwaysOnTop(true);
 							sceltaQualita.setVisible(true);
 							
-							if(video.getQualitaVideo() == null){
+							if(videos.getVideoScelto() == null){
 								throw new Exception("Qualità del video non scelta");
 							}
 							
 							//String url = video.findBestQualityUrl();
-							String url = video.getUrls().get(video.getQualitaVideo());
+							//Video video = videos.getVideoByQuality(videos.getVideoScelto());
+							Video video = videos.getVideoScelto();
 							
 							labelStato.setText(JRaiFrame.DOWNLOAD_IN_CORSO);
 							Downloader downloader = new Downloader();
-							downloader.downloadFile(url, video.getNomeProgramma() + ".mp4", progressBar);
+							downloader.downloadFile(video.getUrl(), videos.getNomeProgramma() + ".mp4", progressBar);
 						} catch (ClientProtocolException e) {
 							JRaiLogger.getLogger().log(Level.SEVERE, "ClientProtocolException: " + e);
 							error = true;
@@ -210,15 +214,15 @@ public class JRaiFrame extends JFrame {
 	/**
 	 * @return the video
 	 */
-	public Video getVideo() {
-		return video;
+	public Videos getVideo() {
+		return videos;
 	}
 
 	/**
-	 * @param video the video to set
+	 * @param videos the video to set
 	 */
-	public void setVideo(Video video) {
-		this.video = video;
+	public void setVideo(Videos videos) {
+		this.videos = videos;
 	}
 
 	/**

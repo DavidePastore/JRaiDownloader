@@ -5,25 +5,31 @@ package jraidownloader.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.SpringLayout;
 import javax.swing.JLabel;
-import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.http.client.ClientProtocolException;
 
 import jraidownloader.JRaiFrame;
-import jraidownloader.Video;
+import jraidownloader.httpclient.JRDHttpClientUtils;
 import jraidownloader.logging.JRaiLogger;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import jraidownloader.utils.ByteUtils;
+import jraidownloader.video.Video;
+import jraidownloader.video.Videos;
 
 /**
  * Dialog che chiede all'utente la qualità del video.
@@ -34,7 +40,7 @@ public class SceltaQualita extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox comboBox = new JComboBox();
-	private Video video;
+	private Videos videos;
 
 	/**
 	 * Launch the application.
@@ -52,9 +58,9 @@ public class SceltaQualita extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public SceltaQualita(JFrame parent, boolean modal, Video video) {
+	public SceltaQualita(JFrame parent, boolean modal, Videos videos) {
 		super(parent, modal);
-		this.video = video;
+		this.videos = videos;
 		init();
 	}
 	
@@ -76,11 +82,11 @@ public class SceltaQualita extends JDialog {
 		sl_contentPanel.putConstraint(SpringLayout.WEST, comboBox, 6, SpringLayout.EAST, lblQualitVideo);
 		
 		//Popolo la combobox
-		Map<String, String> urls = video.getUrls();
-		Set<String> keys = urls.keySet();
-		Iterator iterator = keys.iterator();
+		Iterator<Video> iterator =  videos.getListaVideo().iterator();
+		Video video;
 		while(iterator.hasNext()){
-			comboBox.addItem(iterator.next());
+			video = (Video) iterator.next();
+			comboBox.addItem(video);
 		}
 		
 		contentPanel.add(comboBox);
@@ -92,10 +98,10 @@ public class SceltaQualita extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						String qualitaVideo = (String) comboBox.getSelectedItem();
+						Video videoScelto = (Video) comboBox.getSelectedItem();
 						JRaiFrame jRaiFrame = (JRaiFrame) SceltaQualita.this.getOwner();
-						video.setQualitaVideo(qualitaVideo);
-						jRaiFrame.setVideo(video);
+						videos.setVideoScelto(videoScelto);
+						jRaiFrame.setVideo(videos);
 						SceltaQualita.this.hide();
 					}
 				});
