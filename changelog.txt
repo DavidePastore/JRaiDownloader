@@ -4,3 +4,4 @@ JRaiDownloader v0.1.0
 - il path in cui salvare i video è salvato all'interno di un file di configurazione;
 - possibilità di scegliere la qualità del video da scaricare;
 - ogni qualità video ha il suo oggetto separato;
+- al momento della scelta della qualità video si può vedere anche la dimensione del file;

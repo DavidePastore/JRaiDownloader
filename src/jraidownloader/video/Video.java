@@ -3,6 +3,8 @@
  */
 package jraidownloader.video;
 
+import jraidownloader.utils.ByteUtils;
+
 /**
  * Classe rappresentante il video.
  * @author <a reef="https://github.com/DavidePastore">DavidePastore</a>
@@ -42,7 +44,8 @@ public class Video {
 	 * Rappresentazione in stringa dell'oggetto.
 	 */
 	public String toString(){
-		return qualita + " " + length;
+		
+		return qualita + " - " + ByteUtils.fromBytesToMegaBytes(length) + " MB";
 	}
 
 	/**

@@ -115,7 +115,6 @@ public class JRaiFrame extends JFrame {
 								throw new Exception("Qualità del video non scelta");
 							}
 							
-							//String url = video.findBestQualityUrl();
 							//Video video = videos.getVideoByQuality(videos.getVideoScelto());
 							Video video = videos.getVideoScelto();
 							
