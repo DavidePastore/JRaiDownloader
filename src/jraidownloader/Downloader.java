@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import jraidownloader.httpclient.JRDHttpClient;
@@ -38,10 +39,9 @@ public class Downloader {
 	 * @param fileName il nome del file in cui salvare il video.
 	 * @param dateDir il path in cui salvare il video (il nome della cartella sarà la data).
 	 * @param progressBar la progress bar da aggiornare con il nuovo valore
-	 * @throws IOException 
-	 * @throws ClientProtocolException 
+	 * @throws Exception 
 	 */
-	public void downloadFile(String url, String fileName, String dateDir, JProgressBar progressBar) throws ClientProtocolException, IOException{
+	public void downloadFile(String url, String fileName, String dateDir, JProgressBar progressBar) throws Exception{
 		fileName = this.clearFileName(fileName);
 		HttpClient httpClient = JRDHttpClient.get();
 		HttpGet httpGet = new HttpGet(url);
@@ -70,6 +70,15 @@ public class Downloader {
 			
 			filePath += File.separator + dateDir + File.separator + fileName;
 			JRaiLogger.getLogger().log(Level.INFO, "filepath: " + filePath);
+			
+			//Se il file esiste già controlla se lo si vuole sovrascrivere
+			if(FileUtils.fileExists(filePath)){
+				int risposta = JOptionPane.showConfirmDialog(null, "File già esistente. Desideri sovrascriverlo?", "File già esistente", JOptionPane.YES_NO_OPTION);
+				if(risposta != JOptionPane.YES_OPTION){
+					httpGet.releaseConnection();
+					throw new Exception("Il file non può essere sovrascritto.");
+				}
+			}
 
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
 			int inByte;
