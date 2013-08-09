@@ -6,12 +6,14 @@ package jraidownloader;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
@@ -28,9 +30,6 @@ import jraidownloader.video.Videos;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 /**
  * Finestra principale per l'applicazione.
@@ -120,7 +119,7 @@ public class JRaiFrame extends JFrame {
 							
 							labelStato.setText(JRaiFrame.DOWNLOAD_IN_CORSO);
 							Downloader downloader = new Downloader();
-							downloader.downloadFile(video.getUrl(), videos.getNomeProgramma() + ".mp4", progressBar);
+							downloader.downloadFile(video.getUrl(), videos.getNomeProgramma() + ".mp4", videos.getData(), progressBar);
 						} catch (ClientProtocolException e) {
 							JRaiLogger.getLogger().log(Level.SEVERE, "ClientProtocolException: " + e);
 							error = true;

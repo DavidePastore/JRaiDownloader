@@ -27,7 +27,7 @@ public class PropertiesManager {
 	public static final String SAVE_PATH_KEY = "savePath";
 	
 	/**
-	 * Il path del file in cui salvare le proprietà
+	 * Il path del file in cui salvare le proprietà.
 	 */
 	private static String filePath = "settings.xml";
 	

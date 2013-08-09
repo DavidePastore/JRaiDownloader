@@ -36,11 +36,12 @@ public class Downloader {
 	 * Scarica un file.
 	 * @param url l'url nel quale è presente il file.
 	 * @param fileName il nome del file in cui salvare il video.
+	 * @param dateDir il path in cui salvare il video (il nome della cartella sarà la data).
 	 * @param progressBar la progress bar da aggiornare con il nuovo valore
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 */
-	public void downloadFile(String url, String fileName, JProgressBar progressBar) throws ClientProtocolException, IOException{
+	public void downloadFile(String url, String fileName, String dateDir, JProgressBar progressBar) throws ClientProtocolException, IOException{
 		fileName = this.clearFileName(fileName);
 		HttpClient httpClient = JRDHttpClient.get();
 		HttpGet httpGet = new HttpGet(url);
@@ -54,7 +55,7 @@ public class Downloader {
 			InputStream instream = entity.getContent();
 			BufferedInputStream bis = new BufferedInputStream(instream);
 			
-			//Setting the file path
+			//Legge il path del file impostato
 			String filePath;
 			filePath = PropertiesManager.getProperty(PropertiesManager.SAVE_PATH_KEY);
 			
@@ -63,7 +64,11 @@ public class Downloader {
 				FileUtils.createDirectory(filePath);
 			}
 			
-			filePath += File.separator + fileName;
+			if(!FileUtils.fileExists(filePath + File.separator + dateDir)){
+				FileUtils.createDirectory(filePath + File.separator + dateDir);
+			}
+			
+			filePath += File.separator + dateDir + File.separator + fileName;
 			JRaiLogger.getLogger().log(Level.INFO, "filepath: " + filePath);
 
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filePath)));

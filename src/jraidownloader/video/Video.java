@@ -3,6 +3,7 @@
  */
 package jraidownloader.video;
 
+import jraidownloader.Downloader;
 import jraidownloader.utils.ByteUtils;
 
 /**
@@ -44,7 +45,6 @@ public class Video {
 	 * Rappresentazione in stringa dell'oggetto.
 	 */
 	public String toString(){
-		
 		return qualita + " - " + ByteUtils.fromBytesToMegaBytes(length) + " MB";
 	}
 
