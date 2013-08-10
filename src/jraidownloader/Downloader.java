@@ -73,7 +73,7 @@ public class Downloader {
 			
 			//Se il file esiste già controlla se lo si vuole sovrascrivere
 			if(FileUtils.fileExists(filePath)){
-				int risposta = JOptionPane.showConfirmDialog(null, "File già esistente. Desideri sovrascriverlo?", "File già esistente", JOptionPane.YES_NO_OPTION);
+				int risposta = JOptionPane.showConfirmDialog(null, "<html>File <b>\'" + fileName + "\'</b> già esistente. Desideri sovrascriverlo?</html>", "File già esistente", JOptionPane.YES_NO_OPTION);
 				if(risposta != JOptionPane.YES_OPTION){
 					httpGet.releaseConnection();
 					throw new Exception("Il file non può essere sovrascritto.");
