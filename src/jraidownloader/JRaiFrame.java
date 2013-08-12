@@ -15,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -22,9 +23,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
+import jraidownloader.clipboard.ClipboardUtils;
 import jraidownloader.dialog.SceltaQualita;
 import jraidownloader.dialog.SettingsDialog;
 import jraidownloader.logging.JRaiLogger;
+import jraidownloader.popup.MyPopupMenuListener;
 import jraidownloader.video.Video;
 import jraidownloader.video.Videos;
 
@@ -92,6 +95,49 @@ public class JRaiFrame extends JFrame {
 		sl_contentPane.putConstraint(SpringLayout.EAST, textFieldUrl, -10, SpringLayout.EAST, contentPane);
 		contentPane.add(textFieldUrl);
 		textFieldUrl.setColumns(2);
+		
+		
+		//Popup menu
+		JPopupMenu popupMenu = new JPopupMenu("PopupMenuUrl");
+		JMenuItem menuItem;
+		menuItem = new JMenuItem("Copia");
+		menuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ClipboardUtils.setContent(textFieldUrl.getSelectedText());
+			}
+			
+		});
+	    popupMenu.add(menuItem);
+	    
+	    menuItem = new JMenuItem("Incolla");
+	    menuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textFieldUrl.setText(ClipboardUtils.getContent());
+			}
+	    	
+	    });
+	    popupMenu.add(menuItem);
+	    
+	    menuItem = new JMenuItem("Taglia");
+	    menuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String selectedText = textFieldUrl.getSelectedText();
+				String allText = textFieldUrl.getText();
+				ClipboardUtils.setContent(selectedText);
+				textFieldUrl.setText("");
+			}
+	    	
+	    });
+	    popupMenu.add(menuItem);
+	    
+		popupMenu.addPopupMenuListener(new MyPopupMenuListener());
+		textFieldUrl.setComponentPopupMenu(popupMenu);
 		
 		submitButton = new JButton("Scarica");
 		submitButton.addActionListener(new ActionListener() {
