@@ -8,3 +8,4 @@ JRaiDownloader v0.1.0
 - ogni video viene scaricato in una sottocartella che ha come nome la data del video;
 - se un video con lo stesso nome è già presente, l'utente può scegliere di sovrascriverlo o di annullare il download;
 - se un video con lo stesso nome è già presente, l'utente può personalizzare l'azione da eseguire (sovrascrittura o chiesta conferma);
+- viene mostrata la velocità del download;

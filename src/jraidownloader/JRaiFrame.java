@@ -70,6 +70,7 @@ public class JRaiFrame extends JFrame {
 	private JButton submitButton;
 	private JMenu settingsMenu;
 	private JMenuItem menuItemCustomize;
+	private JLabel downloadSpeed;
 	
 	private Videos videos;
 
@@ -183,6 +184,11 @@ public class JRaiFrame extends JFrame {
 		labelUrl.setHorizontalAlignment(SwingConstants.RIGHT);
 		labelUrl.setLabelFor(textFieldUrl);
 		
+		downloadSpeed = new JLabel("");
+		sl_contentPane.putConstraint(SpringLayout.WEST, downloadSpeed, 0, SpringLayout.WEST, progressBar);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, downloadSpeed, -10, SpringLayout.SOUTH, contentPane);
+		contentPane.add(downloadSpeed);
+		
 		JMenuBar menuBar = new JMenuBar();
 		this.setJMenuBar(menuBar);
 		
@@ -231,4 +237,11 @@ public class JRaiFrame extends JFrame {
 		this.labelStato.setText(stato);
 	}
 
+	/**
+	 * Setta la velocità del download.
+	 * @param speed la velocità del download.
+	 */
+	public void setSpeed(String speed) {
+		this.downloadSpeed.setText(speed);
+	}
 }

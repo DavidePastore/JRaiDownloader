@@ -16,6 +16,15 @@ public class ByteUtils {
 	 * @return Il numero di megabyte.
 	 */
 	public static long fromBytesToMegaBytes(long bytes){
-		return bytes/1024/1024;
+		return fromBytesToKiloBytes(bytes)/1024;
+	}
+	
+	/**
+	 * Converte i byte in kilo byte.
+	 * @param bytes il numero di byte
+	 * @return Il numero di kilobyte.
+	 */
+	public static long fromBytesToKiloBytes(long bytes){
+		return bytes/1024;
 	}
 }
