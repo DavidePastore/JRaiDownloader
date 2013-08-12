@@ -73,10 +73,17 @@ public class Downloader {
 			
 			//Se il file esiste già controlla se lo si vuole sovrascrivere
 			if(FileUtils.fileExists(filePath)){
-				int risposta = JOptionPane.showConfirmDialog(null, "<html>File <b>\'" + fileName + "\'</b> già esistente. Desideri sovrascriverlo?</html>", "File già esistente", JOptionPane.YES_NO_OPTION);
-				if(risposta != JOptionPane.YES_OPTION){
-					httpGet.releaseConnection();
-					throw new Exception("Il file non può essere sovrascritto.");
+				
+				//Se l'opzione relativa alla sovrascrittura è true si procede, altrimenti si chiede all'utente la conferma
+				if(Boolean.parseBoolean(PropertiesManager.getProperty(PropertiesManager.OVERWRITE_FILES))){
+					JRaiLogger.getLogger().log(Level.INFO, "Overwriting file.");
+				}
+				else{
+					int risposta = JOptionPane.showConfirmDialog(null, "<html>File <b>\'" + fileName + "\'</b> già esistente. Desideri sovrascriverlo?</html>", "File già esistente", JOptionPane.YES_NO_OPTION);
+					if(risposta != JOptionPane.YES_OPTION){
+						httpGet.releaseConnection();
+						throw new Exception("Il file non può essere sovrascritto.");
+					}
 				}
 			}
 

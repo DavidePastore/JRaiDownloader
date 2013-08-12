@@ -22,9 +22,14 @@ import jraidownloader.utils.FileUtils;
 public class PropertiesManager {
 	
 	/**
-	 * La chiave per la proprietà del path.
+	 * La chiave per la proprietà del percorso in cui salvare i file.
 	 */
 	public static final String SAVE_PATH_KEY = "savePath";
+
+	/**
+	 * La chiave per l'impostazione di default per la sovrascrittura dei file.
+	 */
+	public static final String OVERWRITE_FILES = "overwriteFiles";
 	
 	/**
 	 * Il path del file in cui salvare le proprietà.
@@ -80,6 +85,7 @@ public class PropertiesManager {
 		if(!FileUtils.fileExists(filePath)){
 			FileUtils.createFile(filePath);
 			saveProps.setProperty(SAVE_PATH_KEY, "downloads");
+			saveProps.setProperty(OVERWRITE_FILES, Boolean.toString(false));
 			storeToXML();
 		}
 	}
