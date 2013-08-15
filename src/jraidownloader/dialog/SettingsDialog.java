@@ -23,7 +23,11 @@ import javax.swing.border.EmptyBorder;
 
 import jraidownloader.logging.JRaiLogger;
 import jraidownloader.properties.PropertiesManager;
+import jraidownloader.video.Videos;
+
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  * Qui verrà gestita la possibilità di modificare le impostazioni del programma.
@@ -36,6 +40,8 @@ public class SettingsDialog extends JDialog {
 	private JTextField textFieldDirectory;
 	private JFileChooser chooser = new JFileChooser();
 	private JCheckBox chckbxSovrascritturaFile;
+	private JCheckBox chckbxQualitaPredefinita;
+	private JComboBox comboBoxQualita;
 
 	/**
 	 * Launch the application.
@@ -61,7 +67,7 @@ public class SettingsDialog extends JDialog {
 	 * Inizializza l'oggetto.
 	 */
 	private void init(){
-		setBounds(100, 100, 450, 133);
+		setBounds(100, 100, 450, 169);
 		setTitle("Personalizza Impostazioni");
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -98,9 +104,25 @@ public class SettingsDialog extends JDialog {
 		contentPanel.add(btnScegliCartella);
 		
 		chckbxSovrascritturaFile = new JCheckBox("Sovrascrivere file esistenti");
-		sl_contentPanel.putConstraint(SpringLayout.NORTH, chckbxSovrascritturaFile, 6, SpringLayout.SOUTH, labelDirectory);
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, chckbxSovrascritturaFile, 6, SpringLayout.SOUTH, textFieldDirectory);
 		sl_contentPanel.putConstraint(SpringLayout.WEST, chckbxSovrascritturaFile, 10, SpringLayout.WEST, contentPanel);
 		contentPanel.add(chckbxSovrascritturaFile);
+		
+		chckbxQualitaPredefinita = new JCheckBox("Qualit\u00E0 predefinita");
+		chckbxQualitaPredefinita.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				comboBoxQualita.setEnabled(chckbxQualitaPredefinita.isSelected());
+			}
+		});
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, chckbxQualitaPredefinita, 6, SpringLayout.SOUTH, chckbxSovrascritturaFile);
+		sl_contentPanel.putConstraint(SpringLayout.WEST, chckbxQualitaPredefinita, 10, SpringLayout.WEST, contentPanel);
+		contentPanel.add(chckbxQualitaPredefinita);
+		
+		comboBoxQualita = new JComboBox();
+		comboBoxQualita.setEnabled(false);
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, comboBoxQualita, 6, SpringLayout.SOUTH, chckbxSovrascritturaFile);
+		sl_contentPanel.putConstraint(SpringLayout.WEST, comboBoxQualita, 6, SpringLayout.EAST, chckbxQualitaPredefinita);
+		contentPanel.add(comboBoxQualita);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -112,6 +134,9 @@ public class SettingsDialog extends JDialog {
 						//Salva le caratteristiche in un file di configurazione
 						PropertiesManager.setProperty(PropertiesManager.SAVE_PATH_KEY, textFieldDirectory.getText());
 						PropertiesManager.setProperty(PropertiesManager.OVERWRITE_FILES, Boolean.toString(chckbxSovrascritturaFile.isSelected()));
+						PropertiesManager.setProperty(PropertiesManager.DEFAULT_QUALITY_ENABLED, Boolean.toString(chckbxQualitaPredefinita.isSelected()));
+						PropertiesManager.setProperty(PropertiesManager.DEFAULT_QUALITY, comboBoxQualita.getSelectedItem().toString());
+						
 						PropertiesManager.storeToXML();
 						
 						SettingsDialog.this.hide();
@@ -132,6 +157,14 @@ public class SettingsDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
+		
+		comboBoxQualita.addItem(Videos.H264);
+		comboBoxQualita.addItem(Videos.H264_400);
+		comboBoxQualita.addItem(Videos.H264_600);
+		comboBoxQualita.addItem(Videos.H264_800);
+		comboBoxQualita.addItem(Videos.H264_1200);
+		comboBoxQualita.addItem(Videos.H264_1500);
+		comboBoxQualita.addItem(Videos.H264_1800);
 		
 		setDefault();
 	}
@@ -156,6 +189,19 @@ public class SettingsDialog extends JDialog {
 		if(PropertiesManager.getProperty(PropertiesManager.OVERWRITE_FILES) != null){
 			boolean overwriteOption = Boolean.parseBoolean(PropertiesManager.getProperty(PropertiesManager.OVERWRITE_FILES));
 			chckbxSovrascritturaFile.setSelected(overwriteOption);
+		}
+		
+		/* Default quality enabled */
+		if(PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY_ENABLED) != null){
+			String proprieta = PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY_ENABLED);
+			boolean valore = Boolean.parseBoolean(proprieta);
+			chckbxQualitaPredefinita.setSelected(valore);
+			comboBoxQualita.setEnabled(valore);
+		}
+		
+		/* Default quality */
+		if(PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY) != null){
+			comboBoxQualita.setSelectedItem(PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY));
 		}
 		
 	}

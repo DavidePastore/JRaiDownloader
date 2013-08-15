@@ -3,7 +3,6 @@
  */
 package jraidownloader.video;
 
-import jraidownloader.Downloader;
 import jraidownloader.utils.ByteUtils;
 
 /**

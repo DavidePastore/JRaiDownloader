@@ -6,6 +6,7 @@ package jraidownloader;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
@@ -28,6 +29,7 @@ import jraidownloader.dialog.SceltaQualita;
 import jraidownloader.dialog.SettingsDialog;
 import jraidownloader.logging.JRaiLogger;
 import jraidownloader.popup.MyPopupMenuListener;
+import jraidownloader.properties.PropertiesManager;
 import jraidownloader.video.Video;
 import jraidownloader.video.Videos;
 
@@ -153,16 +155,41 @@ public class JRaiFrame extends JFrame {
 						try {
 							labelStato.setText(JRaiFrame.ANALISI_URL);
 							videos = new Videos(textFieldUrl.getText());
-							SceltaQualita sceltaQualita = new SceltaQualita(JRaiFrame.this, true, videos);
-							sceltaQualita.setAlwaysOnTop(true);
-							sceltaQualita.setVisible(true);
+							Video video = null;
 							
-							if(videos.getVideoScelto() == null){
-								throw new Exception("Qualità del video non scelta");
+							/* Impostazione di qualità di default o no */
+							boolean defaultQualityEnabled = Boolean.parseBoolean(PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY_ENABLED));
+							String defaultQuality = PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY);
+							if(defaultQualityEnabled && defaultQuality != null) {
+								ArrayList<String> listaQualita = Videos.getAllVideoQuality();
+								
+								if(!listaQualita.contains(defaultQuality)){
+									throw new Exception("Qualità del video non disponibile.");
+								}
+								
+								/* Ciclo tutte le qualità finchè non trovo la qualità migliore disponibile in base a quella scelta */
+								boolean videoTrovato = false;
+								for(int i = listaQualita.indexOf(defaultQuality); i >= 0 && !videoTrovato; i--){
+									String qualita = listaQualita.get(i);
+									video = videos.getVideoByQuality(qualita);
+									if(video != null){
+										JRaiLogger.getLogger().log(Level.INFO, "Qualità video trovata: " + qualita);
+										videoTrovato = true;
+									}
+								}
+							}
+							else {
+								SceltaQualita sceltaQualita = new SceltaQualita(JRaiFrame.this, true, videos);
+								sceltaQualita.setAlwaysOnTop(true);
+								sceltaQualita.setVisible(true);
+								
+								if(videos.getVideoScelto() == null){
+									throw new Exception("Qualità del video non scelta.");
+								}
+								
+								video = videos.getVideoScelto();
 							}
 							
-							//Video video = videos.getVideoByQuality(videos.getVideoScelto());
-							Video video = videos.getVideoScelto();
 							
 							labelStato.setText(JRaiFrame.DOWNLOAD_IN_CORSO);
 							Downloader downloader = new Downloader();

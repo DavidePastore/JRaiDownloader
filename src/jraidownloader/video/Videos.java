@@ -6,10 +6,7 @@ package jraidownloader.video;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import jraidownloader.Canale;
@@ -31,6 +28,17 @@ import org.json.JSONObject;
  *
  */
 public class Videos {
+	
+	/**
+	 * Costanti relative alla qualità del video.
+	 */
+	public static final String H264 = "h264";
+	public static final String H264_400 = "h264_400";
+	public static final String H264_600 = "h264_600";
+	public static final String H264_800 = "h264_800";
+	public static final String H264_1200 = "h264_1200";
+	public static final String H264_1500 = "h264_1500";
+	public static final String H264_1800 = "h264_1800";
 	
 	
 	/**
@@ -175,45 +183,45 @@ public class Videos {
 			if(jSonObjectProgramma.getString("i").equals(Integer.toString(this.id))){
 				
 				//Popolo con tutti gli url
-				if(!jSonObjectProgramma.getString("h264").equals("")){
-					String url = jSonObjectProgramma.getString("h264");
-					Video video = new Video(url, "h264", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264).equals("")){
+					String url = jSonObjectProgramma.getString(H264);
+					Video video = new Video(url, H264, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
-				if(!jSonObjectProgramma.getString("h264_400").equals("")){
-					String url = jSonObjectProgramma.getString("h264_400");
-					Video video = new Video(url, "h264_400", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264_400).equals("")){
+					String url = jSonObjectProgramma.getString(H264_400);
+					Video video = new Video(url, H264_400, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
-				if(!jSonObjectProgramma.getString("h264_600").equals("")){
-					String url = jSonObjectProgramma.getString("h264_600");
-					Video video = new Video(url, "h264_600", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264_600).equals("")){
+					String url = jSonObjectProgramma.getString(H264_600);
+					Video video = new Video(url, H264_600, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
-				if(!jSonObjectProgramma.getString("h264_800").equals("")){
-					String url = jSonObjectProgramma.getString("h264_800");
-					Video video = new Video(url, "h264_800", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264_800).equals("")){
+					String url = jSonObjectProgramma.getString(H264_800);
+					Video video = new Video(url, H264_800, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
-				if(!jSonObjectProgramma.getString("h264_1200").equals("")){
-					String url = jSonObjectProgramma.getString("h264_1200");
-					Video video = new Video(url, "h264_1200", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264_1200).equals("")){
+					String url = jSonObjectProgramma.getString(H264_1200);
+					Video video = new Video(url, H264_1200, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
-				if(!jSonObjectProgramma.getString("h264_1500").equals("")){
-					String url = jSonObjectProgramma.getString("h264_1500");
-					Video video = new Video(url, "h264_1500", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264_1500).equals("")){
+					String url = jSonObjectProgramma.getString(H264_1500);
+					Video video = new Video(url, H264_1500, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
-				if(!jSonObjectProgramma.getString("h264_1800").equals("")){
-					String url = jSonObjectProgramma.getString("h264_1800");
-					Video video = new Video(url, "h264_1800", JRDHttpClientUtils.getContentLength(url));
+				if(!jSonObjectProgramma.getString(H264_1800).equals("")){
+					String url = jSonObjectProgramma.getString(H264_1800);
+					Video video = new Video(url, H264_1800, JRDHttpClientUtils.getContentLength(url));
 					listaVideo.add(video);
 				}
 				
@@ -248,6 +256,22 @@ public class Videos {
 			url = video.getUrl();
 		}
 		return JRDHttpClientUtils.getLocation(url);
+	}
+	
+	/**
+	 * Ritorna tutte le qualità video disponibili.
+	 * @return Ritorna tutte le qualità video disponibili.
+	 */
+	public static ArrayList<String> getAllVideoQuality(){
+		ArrayList<String> qualitaVideo = new ArrayList<String>();
+		qualitaVideo.add(H264);
+		qualitaVideo.add(H264_400);
+		qualitaVideo.add(H264_600);
+		qualitaVideo.add(H264_800);
+		qualitaVideo.add(H264_1200);
+		qualitaVideo.add(H264_1500);
+		qualitaVideo.add(H264_1800);
+		return qualitaVideo;
 	}
 	
 	

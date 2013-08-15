@@ -32,6 +32,17 @@ public class PropertiesManager {
 	public static final String OVERWRITE_FILES = "overwriteFiles";
 	
 	/**
+	 * La chiave dell'abilitazione alla qualità di default.
+	 * Se questa non è settata, la qualità di default non verrà presa in considerazione.
+	 */
+	public static final String DEFAULT_QUALITY_ENABLED = "defaultQualityEnabled";
+	
+	/**
+	 * La chiave per la qualità di default.
+	 */
+	public static final String DEFAULT_QUALITY = "defaultQuality";
+	
+	/**
 	 * Il path del file in cui salvare le proprietà.
 	 */
 	private static String filePath = "settings.xml";
