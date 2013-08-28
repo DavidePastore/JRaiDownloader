@@ -11,3 +11,4 @@ JRaiDownloader v0.1.0
 - viene mostrata la velocità del download;
 - funzionalità di base per il copia/incolla/taglia;
 - si può salvare la qualità predefinita del video da scaricare;
+- aggiunta la licenza;
