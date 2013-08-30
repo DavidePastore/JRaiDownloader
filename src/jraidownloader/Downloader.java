@@ -7,13 +7,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 
 import jraidownloader.httpclient.JRDHttpClient;
 import jraidownloader.logging.JRaiLogger;
@@ -25,7 +23,6 @@ import jraidownloader.utils.FileUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
@@ -105,7 +102,6 @@ public class Downloader {
 	        	//progressBar.setString((int) (ByteUtils.fromBytesToMegaBytes(currentByte)) + " MB/" + (int) (ByteUtils.fromBytesToMegaBytes(length)) + " MB");
 	        	
 	        	if(System.currentTimeMillis()/1000 != tempoIniziale){
-	        		//jRaiFrame.setSpeed(ByteUtils.fromBytesToKiloBytes(speed) + " KB/s");
 	        		downloadSpeed.changeTo(ByteUtils.fromBytesToKiloBytes(speed) + " KB/s");
 	        		
 	        		//Updates the table model
@@ -131,7 +127,6 @@ public class Downloader {
 	        downloadSpeed.changeTo("");
 	        bis.close();
 	        bos.close();
-	        //jRaiFrame.setSpeed("");
 		}
 	}
 	

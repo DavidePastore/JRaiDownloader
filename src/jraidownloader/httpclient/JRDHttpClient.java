@@ -29,7 +29,6 @@ public class JRDHttpClient {
 	public static HttpClient get(){
 		if(httpClient == null){
 			httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
-			//new DefaultHttpClient();
 		}
 		return httpClient;
 	}

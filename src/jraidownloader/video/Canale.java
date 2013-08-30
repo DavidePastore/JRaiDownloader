@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jraidownloader;
+package jraidownloader.video;
 
 import java.util.HashMap;
 import java.util.Map;

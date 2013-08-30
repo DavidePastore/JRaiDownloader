@@ -8,7 +8,6 @@ import java.util.logging.Level;
 
 import jraidownloader.logging.JRaiLogger;
 import jraidownloader.properties.PropertiesManager;
-import jraidownloader.utils.FileUtils;
 
 import org.apache.http.client.ClientProtocolException;
 

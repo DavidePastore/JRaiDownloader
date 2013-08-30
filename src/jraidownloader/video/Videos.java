@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import jraidownloader.Canale;
 import jraidownloader.httpclient.JRDHttpClient;
 import jraidownloader.httpclient.JRDHttpClientUtils;
 import jraidownloader.logging.JRaiLogger;
