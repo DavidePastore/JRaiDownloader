@@ -7,8 +7,9 @@ JRaiDownloader v0.1.0
 - al momento della scelta della qualità video si può vedere anche la dimensione del file;
 - ogni video viene scaricato in una sottocartella che ha come nome la data del video;
 - se un video con lo stesso nome è già presente, l'utente può scegliere di sovrascriverlo o di annullare il download;
-- se un video con lo stesso nome è già presente, l'utente può personalizzare l'azione da eseguire (sovrascrittura o chiesta conferma);
+- se un video con lo stesso nome è già presente, l'utente può personalizzare l'azione da eseguire (sovrascrittura o richiesta conferma);
 - viene mostrata la velocità del download;
 - funzionalità di base per il copia/incolla/taglia;
 - si può salvare la qualità predefinita del video da scaricare;
 - aggiunta la licenza;
+- aggiunto il supporto per il multi download;

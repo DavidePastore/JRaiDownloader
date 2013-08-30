@@ -5,8 +5,9 @@ package jraidownloader;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
@@ -16,21 +17,27 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
-import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
-import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import jraidownloader.clipboard.ClipboardUtils;
-import jraidownloader.dialog.SceltaQualita;
+import jraidownloader.dialog.AddUrl;
 import jraidownloader.dialog.SettingsDialog;
+import jraidownloader.downloader.factory.DownloaderFactory;
+import jraidownloader.downloader.utils.DownloaderUtils;
 import jraidownloader.logging.JRaiLogger;
-import jraidownloader.popup.MyPopupMenuListener;
 import jraidownloader.properties.PropertiesManager;
-import jraidownloader.video.Video;
+import jraidownloader.queue.QueueManager;
+import jraidownloader.table.JRDTable;
+import jraidownloader.table.JRDTableModel;
+import jraidownloader.table.ProgressRenderer;
 import jraidownloader.video.Videos;
 
 import org.apache.http.client.ClientProtocolException;
@@ -38,10 +45,15 @@ import org.json.JSONException;
 
 /**
  * Finestra principale per l'applicazione.
- * @author <a reef="https://github.com/DavidePastore">DavidePastore</a>
+ * @author <a href="https://github.com/DavidePastore">DavidePastore</a>
  *
  */
 public class JRaiFrame extends JFrame {
+	
+	/**
+	 * Singleton class.
+	 */
+	private static JRaiFrame jRaiFrame;
 	
 	/**
 	 * L'URL viene analizzato.
@@ -69,23 +81,30 @@ public class JRaiFrame extends JFrame {
 	public static final String DOWNLOAD_ERRATO = "<html><font color='red'>Download errato</font></html>";
 
 	private JPanel contentPane;
-	private JTextField textFieldUrl;
-	private JProgressBar progressBar;
-	private JLabel labelStato;
-	private JButton submitButton;
 	private JMenu settingsMenu;
 	private JMenuItem menuItemCustomize;
-	private JLabel downloadSpeed;
+	private JSpinner spinnerMaxDownload;
 	
 	private Videos videos;
+	private JRDTable downloadTable;
+	
+	private String addedUrl;
 
 	/**
 	 * Create the frame.
 	 */
-	public JRaiFrame() {
+	private JRaiFrame() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				//Salva le caratteristiche in un file di configurazione
+				PropertiesManager.setProperty(PropertiesManager.MAX_NO_OF_SIMULTANEOUS_DOWNLOADS, spinnerMaxDownload.getValue().toString());
+				PropertiesManager.storeToXML();
+			}
+		});
 		setTitle("JRaiDownloader");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 490, 205);
+		setBounds(100, 100, 542, 341);
 		contentPane = new JPanel();
 		contentPane.setToolTipText("");
 		contentPane.setBorder(new TitledBorder(null, "Form", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -93,119 +112,87 @@ public class JRaiFrame extends JFrame {
 		SpringLayout sl_contentPane = new SpringLayout();
 		contentPane.setLayout(sl_contentPane);
 		
-		textFieldUrl = new JTextField();
-		sl_contentPane.putConstraint(SpringLayout.EAST, textFieldUrl, -10, SpringLayout.EAST, contentPane);
-		contentPane.add(textFieldUrl);
-		textFieldUrl.setColumns(2);
+		downloadTable = new JRDTable();
+		/*sl_contentPane.putConstraint(SpringLayout.NORTH, downloadTable, -11, SpringLayout.NORTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, downloadTable, -11, SpringLayout.NORTH, textFieldUrl);*/
 		
+		/*sl_contentPane.putConstraint(SpringLayout.WEST, downloadTable, 0, SpringLayout.WEST, textFieldUrl);
+		sl_contentPane.putConstraint(SpringLayout.EAST, downloadTable, -488, SpringLayout.EAST, contentPane);*/
+		downloadTable.setModel(JRDTableModel.getInstance());
+		ProgressRenderer progressRenderer = new ProgressRenderer(0, 100);
+		progressRenderer.setStringPainted(true); //Show Progress text
+		downloadTable.setDefaultRenderer(JProgressBar.class, progressRenderer);
+		downloadTable.setRowHeight((int)progressRenderer.getPreferredSize().getHeight());
 		
-		//Popup menu
-		JPopupMenu popupMenu = new JPopupMenu("PopupMenuUrl");
-		JMenuItem menuItem;
-		menuItem = new JMenuItem("Copia");
-		menuItem.addActionListener(new ActionListener(){
+		JScrollPane jScrollPane = new JScrollPane(downloadTable);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, jScrollPane, 9, SpringLayout.NORTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.WEST, jScrollPane, 24, SpringLayout.WEST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, jScrollPane, -10, SpringLayout.EAST, contentPane);
+		contentPane.add(jScrollPane);
+		
+		spinnerMaxDownload = new JSpinner();
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, jScrollPane, -6, SpringLayout.NORTH, spinnerMaxDownload);
+		spinnerMaxDownload.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				int maxNoOfDownloads = Integer.parseInt(spinnerMaxDownload.getValue() + "");
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ClipboardUtils.setContent(textFieldUrl.getSelectedText());
+		        // set this value to queuemanager's variable
+		        QueueManager.getInstance().setMaxNoOfDownloads(maxNoOfDownloads);
+
+		        //Update the queuing sequence so that more uploads may be started.
+		        QueueManager.getInstance().updateQueue();
 			}
-			
 		});
-	    popupMenu.add(menuItem);
-	    
-	    menuItem = new JMenuItem("Incolla");
-	    menuItem.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				textFieldUrl.setText(ClipboardUtils.getContent());
-			}
-	    	
-	    });
-	    popupMenu.add(menuItem);
-	    
-	    menuItem = new JMenuItem("Taglia");
-	    menuItem.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String selectedText = textFieldUrl.getSelectedText();
-				String allText = textFieldUrl.getText();
-				ClipboardUtils.setContent(selectedText);
-				textFieldUrl.setText("");
-			}
-	    	
-	    });
-	    popupMenu.add(menuItem);
-	    
-		popupMenu.addPopupMenuListener(new MyPopupMenuListener());
-		textFieldUrl.setComponentPopupMenu(popupMenu);
 		
-		submitButton = new JButton("Scarica");
-		submitButton.addActionListener(new ActionListener() {
+		String maxNoSimDownloads = PropertiesManager.getProperty(PropertiesManager.MAX_NO_OF_SIMULTANEOUS_DOWNLOADS);
+		QueueManager.getInstance().setMaxNoOfDownloads(Integer.parseInt(maxNoSimDownloads));
+		spinnerMaxDownload.setModel(new SpinnerNumberModel(Integer.parseInt(maxNoSimDownloads), 1, null, 1));
+		contentPane.add(spinnerMaxDownload);
+		
+		JLabel lblSimultaneousDownloads = new JLabel("Max n. di download simultanei:");
+		sl_contentPane.putConstraint(SpringLayout.WEST, lblSimultaneousDownloads, 26, SpringLayout.WEST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, spinnerMaxDownload, -3, SpringLayout.NORTH, lblSimultaneousDownloads);
+		sl_contentPane.putConstraint(SpringLayout.WEST, spinnerMaxDownload, 6, SpringLayout.EAST, lblSimultaneousDownloads);
+		sl_contentPane.putConstraint(SpringLayout.EAST, spinnerMaxDownload, 50, SpringLayout.EAST, lblSimultaneousDownloads);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, lblSimultaneousDownloads, -3, SpringLayout.SOUTH, contentPane);
+		contentPane.add(lblSimultaneousDownloads);
+		
+		JButton btnAddUrl = new JButton("Aggiungi Url");
+		sl_contentPane.putConstraint(SpringLayout.EAST, btnAddUrl, -10, SpringLayout.EAST, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, btnAddUrl, 0, SpringLayout.SOUTH, spinnerMaxDownload);
+		btnAddUrl.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				AddUrl addUrl = new AddUrl(JRaiFrame.this);
+				addUrl.setAlwaysOnTop(true);
+				addUrl.setVisible(true);
+				
 				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
 					
-					boolean error = false;
+					String downloaderName;
 
 					@Override
 					protected Void doInBackground() {
-						submitButton.setEnabled(false);
-						progressBar.setEnabled(true);
 						try {
-							labelStato.setText(JRaiFrame.ANALISI_URL);
-							videos = new Videos(textFieldUrl.getText());
-							Video video = null;
-							
-							/* Impostazione di qualità di default o no */
-							boolean defaultQualityEnabled = Boolean.parseBoolean(PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY_ENABLED));
-							String defaultQuality = PropertiesManager.getProperty(PropertiesManager.DEFAULT_QUALITY);
-							if(defaultQualityEnabled && defaultQuality != null) {
-								ArrayList<String> listaQualita = Videos.getAllVideoQuality();
+							if(addedUrl != null){
+								downloaderName = DownloaderUtils.getDownloaderName(addedUrl);
 								
-								if(!listaQualita.contains(defaultQuality)){
-									throw new Exception("Qualità del video non disponibile.");
+								if(downloaderName == null){
+									throw new Exception("Url non corrispondente a nessun downloader.");
 								}
 								
-								/* Ciclo tutte le qualità finchè non trovo la qualità migliore disponibile in base a quella scelta */
-								boolean videoTrovato = false;
-								for(int i = listaQualita.indexOf(defaultQuality); i >= 0 && !videoTrovato; i--){
-									String qualita = listaQualita.get(i);
-									video = videos.getVideoByQuality(qualita);
-									if(video != null){
-										JRaiLogger.getLogger().log(Level.INFO, "Qualità video trovata: " + qualita);
-										videoTrovato = true;
-									}
-								}
+								JRDTableModel.getInstance().addDownload(DownloaderFactory.createDownloader(downloaderName, addedUrl));
+								QueueManager.getInstance().setQueueLock(false);
+								QueueManager.getInstance().setStopFurther(false);
+								addedUrl = null;
 							}
-							else {
-								SceltaQualita sceltaQualita = new SceltaQualita(JRaiFrame.this, true, videos);
-								sceltaQualita.setAlwaysOnTop(true);
-								sceltaQualita.setVisible(true);
-								
-								if(videos.getVideoScelto() == null){
-									throw new Exception("Qualità del video non scelta.");
-								}
-								
-								video = videos.getVideoScelto();
-							}
-							
-							
-							labelStato.setText(JRaiFrame.DOWNLOAD_IN_CORSO);
-							Downloader downloader = new Downloader();
-							downloader.downloadFile(video.getUrl(), videos.getNomeProgramma() + ".mp4", videos.getData(), progressBar);
 						} catch (ClientProtocolException e) {
 							JRaiLogger.getLogger().log(Level.SEVERE, "ClientProtocolException: " + e);
-							error = true;
 						} catch (IOException e) {
 							JRaiLogger.getLogger().log(Level.SEVERE, "IOException: " + e);
-							error = true;
 						} catch (JSONException e) {
 							JRaiLogger.getLogger().log(Level.SEVERE, "JSONException: " + e);
-							error = true;
 						} catch (Exception e) {
 							JRaiLogger.getLogger().log(Level.SEVERE, "Exception: " + e);
-							error = true;
 						}
 						return null;
 					}
@@ -216,51 +203,16 @@ public class JRaiFrame extends JFrame {
 					@Override
 					protected void done() {
 						//super.done();
-						if(error){
-							submitButton.setEnabled(true);
-							labelStato.setText(JRaiFrame.DOWNLOAD_ERRATO);
-						}
-						else{
-							submitButton.setEnabled(true);
-							labelStato.setText(JRaiFrame.DOWNLOAD_COMPLETATO);
-						}
+						//submitButton.setEnabled(true);
 					}
 					
 				};
             	worker.execute();
 			}
 		});
-		sl_contentPane.putConstraint(SpringLayout.NORTH, submitButton, 10, SpringLayout.SOUTH, textFieldUrl);
-		sl_contentPane.putConstraint(SpringLayout.EAST, submitButton, 0, SpringLayout.EAST, textFieldUrl);
-		contentPane.add(submitButton);
+		contentPane.add(btnAddUrl);
 		
-		progressBar = new JProgressBar();
-		sl_contentPane.putConstraint(SpringLayout.NORTH, progressBar, 14, SpringLayout.SOUTH, submitButton);
-		sl_contentPane.putConstraint(SpringLayout.SOUTH, progressBar, 33, SpringLayout.SOUTH, submitButton);
-		sl_contentPane.putConstraint(SpringLayout.EAST, progressBar, 0, SpringLayout.EAST, textFieldUrl);
-		contentPane.add(progressBar);
 		
-		labelStato = new JLabel("");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, labelStato, 4, SpringLayout.NORTH, submitButton);
-		sl_contentPane.putConstraint(SpringLayout.EAST, labelStato, -155, SpringLayout.WEST, submitButton);
-		contentPane.add(labelStato);
-		
-		JLabel labelUrl = new JLabel("URL");
-		sl_contentPane.putConstraint(SpringLayout.WEST, labelStato, 0, SpringLayout.WEST, labelUrl);
-		sl_contentPane.putConstraint(SpringLayout.WEST, progressBar, 0, SpringLayout.WEST, labelUrl);
-		sl_contentPane.putConstraint(SpringLayout.NORTH, textFieldUrl, -3, SpringLayout.NORTH, labelUrl);
-		sl_contentPane.putConstraint(SpringLayout.WEST, textFieldUrl, 34, SpringLayout.EAST, labelUrl);
-		sl_contentPane.putConstraint(SpringLayout.NORTH, labelUrl, 3, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, labelUrl, 26, SpringLayout.WEST, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.EAST, labelUrl, 52, SpringLayout.WEST, contentPane);
-		contentPane.add(labelUrl);
-		labelUrl.setHorizontalAlignment(SwingConstants.RIGHT);
-		labelUrl.setLabelFor(textFieldUrl);
-		
-		downloadSpeed = new JLabel("");
-		sl_contentPane.putConstraint(SpringLayout.WEST, downloadSpeed, 0, SpringLayout.WEST, progressBar);
-		sl_contentPane.putConstraint(SpringLayout.SOUTH, downloadSpeed, -10, SpringLayout.SOUTH, contentPane);
-		contentPane.add(downloadSpeed);
 		
 		JMenuBar menuBar = new JMenuBar();
 		this.setJMenuBar(menuBar);
@@ -283,9 +235,20 @@ public class JRaiFrame extends JFrame {
 	 * Create the frame with the title.
 	 * @param title il titolo del frame.
 	 */
-	public JRaiFrame(String title){
+	private JRaiFrame(String title){
 		this();
 		setTitle(title);
+	}
+	
+	/**
+	 * Return this instance.
+	 * @return the JRaiFrame instance.
+	 */
+	public static JRaiFrame getInstance(){
+		if(jRaiFrame == null){
+			jRaiFrame = new JRaiFrame();
+		}
+		return jRaiFrame;
 	}
 	
 	/**
@@ -294,27 +257,41 @@ public class JRaiFrame extends JFrame {
 	public Videos getVideo() {
 		return videos;
 	}
-
+	
+	/**
+	 * @return the table model
+	 */
+	public JRDTableModel getModel() {
+		return (JRDTableModel) this.downloadTable.getModel();
+	}
+	
+	/**
+	 * @return the table
+	 */
+	public JTable getTable() {
+		return this.downloadTable;
+	}
+	
+	/**
+	 * Set the added url.
+	 * @param addedUrl the addedUrl to set
+	 */
+	public void setAddedUrl(String addedUrl) {
+		this.addedUrl = addedUrl;
+	}
+	
+	/**
+	 * Set the the table model.
+	 * @param model the model to set for the table.
+	 */
+	public void setModel(JRDTableModel model){
+		this.downloadTable.setModel(model);
+	}
+	
 	/**
 	 * @param videos the video to set
 	 */
 	public void setVideo(Videos videos) {
 		this.videos = videos;
-	}
-
-	/**
-	 * Setta il testo della label stato.
-	 * @param string il nuovo testo da settare.
-	 */
-	public void setStateLabel(String stato) {
-		this.labelStato.setText(stato);
-	}
-
-	/**
-	 * Setta la velocità del download.
-	 * @param speed la velocità del download.
-	 */
-	public void setSpeed(String speed) {
-		this.downloadSpeed.setText(speed);
 	}
 }

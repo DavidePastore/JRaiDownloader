@@ -5,6 +5,7 @@ package jraidownloader.httpclient;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 
 /**
  * @author <a reef="https://github.com/DavidePastore">DavidePastore</a>
@@ -27,7 +28,8 @@ public class JRDHttpClient {
 	 */
 	public static HttpClient get(){
 		if(httpClient == null){
-			httpClient = new DefaultHttpClient();
+			httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
+			//new DefaultHttpClient();
 		}
 		return httpClient;
 	}

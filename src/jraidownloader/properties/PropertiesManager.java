@@ -22,14 +22,9 @@ import jraidownloader.utils.FileUtils;
 public class PropertiesManager {
 	
 	/**
-	 * La chiave per la proprietà del percorso in cui salvare i file.
+	 * La chiave per la qualità di default.
 	 */
-	public static final String SAVE_PATH_KEY = "savePath";
-
-	/**
-	 * La chiave per l'impostazione di default per la sovrascrittura dei file.
-	 */
-	public static final String OVERWRITE_FILES = "overwriteFiles";
+	public static final String DEFAULT_QUALITY = "defaultQuality";
 	
 	/**
 	 * La chiave dell'abilitazione alla qualità di default.
@@ -38,9 +33,19 @@ public class PropertiesManager {
 	public static final String DEFAULT_QUALITY_ENABLED = "defaultQualityEnabled";
 	
 	/**
-	 * La chiave per la qualità di default.
+	 * La chiave per l'impostazione di default per la sovrascrittura dei file.
 	 */
-	public static final String DEFAULT_QUALITY = "defaultQuality";
+	public static final String OVERWRITE_FILES = "overwriteFiles";
+	
+	/**
+	 * La chiave per il numero di download simultanei
+	 */
+	public static final String MAX_NO_OF_SIMULTANEOUS_DOWNLOADS = "maxNoOfSimultaneousDownloads";
+	
+	/**
+	 * La chiave per la proprietà del percorso in cui salvare i file.
+	 */
+	public static final String SAVE_PATH_KEY = "savePath";
 	
 	/**
 	 * Il path del file in cui salvare le proprietà.
@@ -95,8 +100,11 @@ public class PropertiesManager {
 	public static void setDefaultValues(){
 		if(!FileUtils.fileExists(filePath)){
 			FileUtils.createFile(filePath);
-			saveProps.setProperty(SAVE_PATH_KEY, "downloads");
+			
+			saveProps.setProperty(MAX_NO_OF_SIMULTANEOUS_DOWNLOADS, Integer.toString(2));
 			saveProps.setProperty(OVERWRITE_FILES, Boolean.toString(false));
+			saveProps.setProperty(SAVE_PATH_KEY, "downloads");
+			
 			storeToXML();
 		}
 	}

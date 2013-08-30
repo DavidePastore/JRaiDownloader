@@ -114,7 +114,7 @@ public class SceltaQualita extends JDialog {
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						JRaiFrame jRaiFrame = (JRaiFrame) SceltaQualita.this.getOwner();
-						jRaiFrame.setStateLabel(JRaiFrame.QUALITA_NON_SCELTA);
+						//jRaiFrame.setStateLabel(JRaiFrame.QUALITA_NON_SCELTA);
 						SceltaQualita.this.hide();
 					}
 				});
