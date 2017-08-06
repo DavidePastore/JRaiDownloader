@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment/>
+<entry key="savePath">downloads</entry>
+<entry key="defaultQualityEnabled">true</entry>
+<entry key="maxNoOfSimultaneousDownloads">10</entry>
+<entry key="defaultQuality">h264</entry>
+<entry key="overwriteFiles">true</entry>
+</properties>
